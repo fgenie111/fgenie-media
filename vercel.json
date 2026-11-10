@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/drops.js": { "includeFiles": "drops.json" }
+  }
+}

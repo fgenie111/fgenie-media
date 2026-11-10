@@ -1,0 +1,32 @@
+{
+  "_note": "Build drops for founders. Only status 'approved' entries are shown. FG approves each one. chain.status stays 'not_minted' until the Base collection is launched with FG's go-ahead.",
+  "drops": [
+    {
+      "id": "drop-001",
+      "n": 1,
+      "date": "2026-11-08",
+      "title": "The Cube has a face",
+      "body": "The Genie Cube concept paper and landing page went up at cube.genieai.space, with the Cube Studio so you can turn it, light the seam and pick a finish.",
+      "status": "approved",
+      "chain": { "network": "base", "status": "not_minted", "tx": null }
+    },
+    {
+      "id": "drop-002",
+      "n": 2,
+      "date": "2026-11-08",
+      "title": "Founders package designed",
+      "body": "Your Genie Cube Spark, the Founders Cap and Tee, the Think, Work and Approve coins, and the sealed G NFT now have their first design.",
+      "status": "approved",
+      "chain": { "network": "base", "status": "not_minted", "tx": null }
+    },
+    {
+      "id": "drop-003",
+      "n": 3,
+      "date": "2026-11-10",
+      "title": "Genie Work starts",
+      "body": "The first thing your Spark can do: a morning brief from your calendar and inbox, reply drafts you approve before anything sends, and holds it books only when you say so.",
+      "status": "pending_fg",
+      "chain": { "network": "base", "status": "not_minted", "tx": null }
+    }
+  ]
+}

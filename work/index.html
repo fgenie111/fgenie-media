@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Genie Work</title>
+<meta name="description" content="Genie Work: your Genie Cube Spark keeps your day. Morning brief, reply drafts you approve, holds it books only when you say so.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper: #F6F3EC; --paper-2: #EEEAE0; --ink: #16141B; --ink-2: #48444F; --label: #625D69; --line: #D8D2C6;
+  --accent: #2F5BD6; --accent-ink: #2449B0; --card: #FBF9F4;
+  --plate: #0E0D12; --plate-2: #1C1A22; --on-plate: #F6F3EC; --plate-mute: rgba(246,243,236,.66); --plate-line: rgba(246,243,236,.14);
+  --held-bg: #FBEFD6; --held-ink: #7A4F00; --blocked-bg: #F9E1DD; --blocked-ink: #A3261B; --active-bg: #E3E9FA;
+  --spectrum: conic-gradient(from 210deg, #2F5BD6, #19C2AE, #FFB020, #FF6A4D, #E8398F, #2F5BD6);
+  --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif; --body: 'Inter', -apple-system, 'Segoe UI', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --r-control: 12px; --r-card: 24px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 15px/1.55 var(--body); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.page { max-width: 1120px; margin: 0 auto; padding-block: 20px 80px; }
+.label { font: 500 11px/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+.mono { font-family: var(--mono); }
+
+.runhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--ink); padding-bottom: 10px; }
+.runhead nav { display: flex; gap: 18px; flex-wrap: wrap; }
+.runhead a { color: var(--label); text-decoration: none; font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.runhead a:hover { color: var(--ink); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: end; padding-block: 40px 28px; border-bottom: 1px solid var(--line); }
+h1 { font-family: var(--display); font-variation-settings: 'wdth' 125; font-weight: 800; font-size: clamp(48px, 9vw, 112px); line-height: .86; letter-spacing: -.035em; margin: 16px 0 0; text-transform: uppercase; }
+h1 .thin { font-weight: 200; display: block; }
+.lede { font-family: var(--display); font-weight: 500; font-size: clamp(19px, 2.4vw, 26px); line-height: 1.2; letter-spacing: -.01em; margin: 20px 0 0; max-width: 30ch; text-wrap: balance; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 7px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink-2); background: var(--paper); }
+.chip.ink { border-color: var(--ink); color: var(--ink); }
+.chip.held { background: var(--held-bg); color: var(--held-ink); border-color: transparent; }
+
+/* Spark plate */
+.spark { background: var(--plate); color: var(--on-plate); border-radius: var(--r-card); padding: 20px; display: grid; gap: 14px; }
+.spark .label { color: var(--plate-mute); }
+.cube { width: 132px; height: 132px; margin: 6px auto; position: relative; border-radius: 26px; background: linear-gradient(145deg, #2a2832, #0f0e13 70%); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 20px 40px rgba(0,0,0,.4); }
+.cube::after { content: ''; position: absolute; left: 10%; right: 10%; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 3px; background: var(--plate-line); transition: box-shadow .6s, background .6s; }
+.cube.lit::after { background: linear-gradient(90deg, #2F5BD6, #19C2AE, #FFB020, #FF6A4D, #E8398F); box-shadow: 0 0 18px rgba(47,91,214,.7), 0 0 34px rgba(232,57,143,.35); animation: breathe 3.2s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .cube.lit::after { animation: none; } }
+.cube .no { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; font: 500 10px var(--mono); letter-spacing: .14em; color: var(--plate-mute); }
+.spark-state { font: 500 14px/1.4 var(--body); text-align: center; min-height: 2.8em; }
+.spark .who { display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--plate-line); padding-top: 12px; font-size: 13px; }
+.spark .who img { width: 28px; height: 28px; border-radius: 50%; }
+.spark .who .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+button, .btn { font: 600 14px/1 var(--body); border-radius: var(--r-control); padding: 12px 16px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+button.ghost, .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+button.ghost:hover { border-color: var(--ink); }
+.spark button.ghost { color: var(--on-plate); border-color: var(--plate-line); }
+button.primary, .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover { background: var(--accent-ink); }
+button:disabled { opacity: .5; cursor: default; }
+.gbtn { background: #fff; color: var(--ink); border-color: var(--line); }
+.gbtn svg { width: 18px; height: 18px; }
+
+.banner { margin-top: 20px; border-radius: 16px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; font-size: 14px; }
+.banner.held { background: var(--held-bg); color: var(--held-ink); }
+.banner.blocked { background: var(--blocked-bg); color: var(--blocked-ink); }
+.banner.active { background: var(--active-bg); color: var(--accent-ink); }
+.banner b { font-weight: 600; }
+.banner .grow { flex: 1; min-width: 220px; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; margin-top: 28px; }
+section.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 22px; }
+section.card + section.card { margin-top: 28px; }
+.sechead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+h2 { font-family: var(--display); font-variation-settings: 'wdth' 110; font-weight: 700; font-size: 24px; letter-spacing: -.015em; margin: 4px 0 0; }
+
+.brief-head { font-family: var(--display); font-weight: 600; font-size: clamp(20px, 2.6vw, 28px); line-height: 1.2; letter-spacing: -.012em; margin: 0; text-wrap: balance; }
+.moved { color: var(--ink-2); margin: 10px 0 0; }
+.stats { display: flex; gap: 22px; margin-top: 16px; flex-wrap: wrap; }
+.stat b { display: block; font: 700 28px/1 var(--display); }
+
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.timeline li:first-child { border-top: 0; }
+.timeline .t { font: 500 13px/1.4 var(--mono); color: var(--ink-2); }
+.timeline .ttl { font-weight: 600; }
+.timeline .note { color: var(--ink-2); font-size: 14px; }
+.timeline li.past { opacity: .5; }
+
+.reply { border-top: 1px solid var(--line); padding: 16px 0; }
+.reply:first-of-type { border-top: 0; padding-top: 4px; }
+.reply .from { font-weight: 600; overflow-wrap: anywhere; }
+.reply .subj { color: var(--ink-2); font-size: 14px; overflow-wrap: anywhere; }
+.reply .why { font-size: 13px; color: var(--label); margin-top: 4px; }
+.reply textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 400 15px/1.5 var(--body); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: var(--r-control); padding: 12px; resize: vertical; }
+.reply textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+.done { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); }
+
+.hold { border: 1px dashed var(--line); border-radius: 16px; padding: 14px; margin-top: 10px; }
+.hold .ttl { font-weight: 600; }
+.hold .t { font: 500 13px var(--mono); color: var(--ink-2); }
+
+.receipts, .drops { list-style: none; margin: 0; padding: 0; }
+.receipts li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; display: grid; gap: 2px; }
+.receipts li:first-child { border-top: 0; }
+.receipts .k { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--label); }
+.drops li { padding: 14px 0; border-top: 1px solid var(--line); }
+.drops li:first-child { border-top: 0; }
+.drops .n { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--label); text-transform: uppercase; display: flex; gap: 10px; flex-wrap: wrap; }
+.drops .ttl { font-weight: 600; margin-top: 4px; }
+.drops p { margin: 4px 0 0; color: var(--ink-2); font-size: 14px; }
+.chainpill { border-radius: 99px; padding: 2px 8px; background: var(--paper-2); }
+
+.empty { color: var(--label); font-size: 14px; padding: 6px 0; }
+.skeleton { height: 14px; border-radius: 7px; background: linear-gradient(90deg, var(--paper-2), #F3EFE6, var(--paper-2)); background-size: 200% 100%; animation: sk 1.4s infinite; margin: 10px 0; }
+@keyframes sk { to { background-position: -200% 0; } }
+
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.how div { border-top: 2px solid var(--ink); padding-top: 10px; font-size: 14px; color: var(--ink-2); }
+.how b { display: block; color: var(--ink); font-family: var(--display); font-size: 17px; margin-bottom: 4px; }
+
+footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--label); font-size: 13px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: 24px; }
+  .grid { grid-template-columns: 1fr; }
+  .how { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="runhead">
+    <span class="label">Genie Cube · Genie Work · Private beta</span>
+    <nav><a href="/">The Cube</a><a href="#brief">Brief</a><a href="#replies">Replies</a><a href="#drops">Build drops</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="chips"><span class="chip ink">Genie Work v0.1</span><span class="chip">First 100 founders</span><span class="chip held" id="modeChip">Sample day</span></div>
+      <h1>Genie<span class="thin">Work</span></h1>
+      <p class="lede">Your Spark keeps your day. Genie drafts, you approve, and every run leaves a receipt.</p>
+    </div>
+    <aside class="spark" aria-label="Your Genie Cube Spark">
+      <span class="label">Your Spark</span>
+      <div class="cube" id="cube"><span class="no" id="cubeNo">F-0000</span></div>
+      <div class="spark-state" id="sparkState">Waiting for your day.</div>
+      <div class="who" id="who" hidden><img id="whoPic" alt=""><span class="grow" id="whoName"></span><button class="ghost" id="signout" type="button">Disconnect</button></div>
+      <a class="btn gbtn" id="connect" href="/api/google/start">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.5 0 20.1 0 24s1 7.5 2.6 10.8l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>
+        Connect Google Calendar and Gmail
+      </a>
+    </aside>
+  </div>
+
+  <div id="banner"></div>
+
+  <div class="grid">
+    <div>
+      <section class="card" id="brief">
+        <div class="sechead"><div><span class="label">Morning brief</span><h2 id="briefDate">Today</h2></div><button class="ghost" id="refresh" type="button">Refresh</button></div>
+        <div id="briefBody"><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div>
+      </section>
+
+      <section class="card" id="replies">
+        <div class="sechead"><div><span class="label">Email</span><h2>Waiting on you</h2></div><span class="label" id="replyCount"></span></div>
+        <div id="replyList"><div class="skeleton"></div></div>
+      </section>
+    </div>
+
+    <div>
+      <section class="card" id="today">
+        <div class="sechead"><div><span class="label">Calendar</span><h2>Today</h2></div></div>
+        <ul class="timeline" id="timeline"><li><div class="skeleton"></div></li></ul>
+        <div id="holds"></div>
+      </section>
+
+      <section class="card" id="receiptsCard">
+        <div class="sechead"><div><span class="label">Receipts</span><h2>What Genie did</h2></div></div>
+        <ul class="receipts" id="receipts"></ul>
+      </section>
+
+      <section class="card" id="drops">
+        <div class="sechead"><div><span class="label">Build drops</span><h2>From the build</h2></div><span class="label">Base</span></div>
+        <ul class="drops" id="dropList"></ul>
+      </section>
+    </div>
+  </div>
+
+  <section style="margin-top:40px">
+    <span class="label">How it works</span>
+    <div class="how">
+      <div><b>It reads</b>Today's calendar and the inbox threads from the last two days that are waiting on you.</div>
+      <div><b>It drafts</b>Replies in your voice and up to two holds in your free time. Edit anything.</div>
+      <div><b>You approve</b>Nothing sends and nothing books until you tap Approve. Each action leaves a receipt.</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Genie Work is a private beta. Gmail access is limited to 100 founders until Google verifies the app.</span>
+    <span>Disconnect any time. Genie keeps no copy of your mail.</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const fmtTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const nameOf = (from) => (String(from).match(/^"?([^"<]+?)"?\s*</) || [, String(from)])[1].trim();
+  const addrOf = (from) => (String(from).match(/<([^>]+)>/) || [, String(from)])[1].trim();
+
+  let me = { signedIn: false }, brief = null, demo = true;
+
+  // Receipts live in this browser for v0.1. They move to the founder record when the founders table exists.
+  const RKEY = 'genie-work-receipts';
+  const loadReceipts = () => { try { return JSON.parse(localStorage.getItem(RKEY) || '[]'); } catch { return []; } };
+  const saveReceipt = (r) => { const all = [r, ...loadReceipts()].slice(0, 50); try { localStorage.setItem(RKEY, JSON.stringify(all)); } catch {} renderReceipts(); };
+
+  const SAMPLE = (() => {
+    const d = new Date(); d.setMinutes(0, 0, 0);
+    const at = (h, m = 0) => { const x = new Date(d); x.setHours(h, m); return x.toISOString(); };
+    return {
+      headline: 'Three meetings, two replies that matter, and a clear afternoon for the Cube.',
+      moved: 'Appliq sent cap and tee samples overnight, and a founder asked when the NFT reveal is.',
+      meetings: [
+        { id: 'e1', title: 'Standup with the build team', start: at(9), end: at(9, 30), attendees: 4, note: 'Ask where the founders webhook stands.' },
+        { id: 'e2', title: 'Appliq: sample review', start: at(11), end: at(11, 45), attendees: 2, note: 'Cap stitching and tee weight are the open calls.' },
+        { id: 'e3', title: 'Founder call: Maya', start: at(15, 30), end: at(16), attendees: 2, note: 'Early buyer, Founder No. 0007. Wants the Spark finishes.' },
+      ],
+      replies: [
+        { threadId: 's1', from: 'Appliq Studio <hello@appliq.example>', to: 'hello@appliq.example', subject: 'Samples: Founders Cap and Tee', why: 'They need sign-off on samples before the run.', draft: 'Thanks for the quick turnaround. The cap looks right. On the tee, can we go one step heavier on the fabric and keep the G at the size on the mockup? Once that is in, we are good to schedule the run.' },
+        { threadId: 's2', from: 'Maya R. <maya@example.com>', to: 'maya@example.com', subject: 'When does the NFT reveal?', why: 'A founder asking about the reveal date.', draft: 'Great question. The reveal date is not set yet. Your G NFT stays sealed until then, and you will get an email the day it opens. Until then your Spark is live on your founder page.' },
+      ],
+      holds: [ { title: 'Focus: Genie Work beta', start: at(13), end: at(14, 30), why: 'Your afternoon is open and the beta is the top thread.' } ],
+      counts: { threadsRead: 7, needReply: 2 },
+      zone: tz,
+    };
+  })();
+
+  function setSpark(needs) {
+    $('cube').classList.toggle('lit', needs > 0);
+    $('sparkState').textContent = needs > 0 ? `${needs} ${needs === 1 ? 'thing needs' : 'things need'} you.` : 'Nothing needs you right now.';
+  }
+
+  function banner(kind, html, action) {
+    $('banner').innerHTML = `<div class="banner ${kind}"><div class="grow">${html}</div>${action || ''}</div>`;
+  }
+
+  function renderBrief() {
+    const b = brief;
+    $('briefDate').textContent = new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    $('briefBody').innerHTML = `
+      <p class="brief-head">${esc(b.headline)}</p>
+      ${b.moved ? `<p class="moved"><span class="label">Overnight</span><br>${esc(b.moved)}</p>` : ''}
+      <div class="stats">
+        <div class="stat"><b>${b.meetings.length}</b><span class="label">Meetings</span></div>
+        <div class="stat"><b>${b.replies.length}</b><span class="label">Need a reply</span></div>
+        <div class="stat"><b>${b.counts?.threadsRead ?? 0}</b><span class="label">Threads read</span></div>
+      </div>`;
+
+    const now = Date.now();
+    $('timeline').innerHTML = b.meetings.length ? b.meetings.map(m => `
+      <li class="${!m.allDay && Date.parse(m.end) < now ? 'past' : ''}">
+        <div class="t">${m.allDay ? 'All day' : `${fmtTime(m.start)}<br>${fmtTime(m.end)}`}</div>
+        <div><div class="ttl">${esc(m.title)}</div>${m.note ? `<div class="note">${esc(m.note)}</div>` : ''}${m.link ? `<a href="${esc(m.link)}" target="_blank" rel="noopener">Join</a>` : ''}</div>
+      </li>`).join('') : '<li><div></div><div class="empty">Nothing on the calendar today.</div></li>';
+
+    $('holds').innerHTML = b.holds.map((h, i) => `
+      <div class="hold" data-i="${i}">
+        <span class="label">Suggested hold</span>
+        <div class="ttl">${esc(h.title)}</div>
+        <div class="t">${fmtTime(h.start)} to ${fmtTime(h.end)}</div>
+        <div class="note" style="color:var(--ink-2);font-size:14px">${esc(h.why)}</div>
+        <div class="row"><button class="primary" data-act="hold" data-i="${i}" type="button">Approve hold</button><button class="ghost" data-act="skiphold" data-i="${i}" type="button">Skip</button></div>
+      </div>`).join('');
+
+    $('replyCount').textContent = b.replies.length ? `${b.replies.length} drafted` : '';
+    $('replyList').innerHTML = b.replies.length ? b.replies.map((r, i) => `
+      <div class="reply" data-i="${i}">
+        <div class="from">${esc(nameOf(r.from))}</div>
+        <div class="subj">${esc(r.subject)}</div>
+        <div class="why">${esc(r.why)}</div>
+        <label class="label" for="d${i}" style="display:block;margin-top:10px">Genie's draft, edit anything</label>
+        <textarea id="d${i}">${esc(r.draft)}</textarea>
+        <div class="row"><button class="primary" data-act="send" data-i="${i}" type="button">Approve and send</button><button class="ghost" data-act="skip" data-i="${i}" type="button">Not now</button><span class="label">To ${esc(addrOf(r.to))}</span></div>
+      </div>`).join('') : '<div class="empty">Inbox is clear. Nothing is waiting on you.</div>';
+
+    setSpark(b.replies.length + b.holds.length);
+  }
+
+  function renderReceipts() {
+    const all = loadReceipts();
+    $('receipts').innerHTML = all.length ? all.map(r => `
+      <li><span class="k">${r.kind === 'reply' ? 'Sent' : 'Booked'} · ${new Date(r.at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${r.sample ? ' · sample' : ''}</span>
+      <span>${r.kind === 'reply' ? `Reply to ${esc(addrOf(r.to))}: ${esc(r.subject)}` : `${esc(r.title)}, ${fmtTime(r.start)} to ${fmtTime(r.end)}`}</span></li>`).join('')
+      : '<li class="empty">No actions yet. Every send and booking you approve shows up here.</li>';
+  }
+
+  async function renderDrops() {
+    try {
+      const r = await fetch('/api/drops');
+      if (!r.ok) throw 0;
+      const { drops } = await r.json();
+      $('dropList').innerHTML = drops.map(d => `
+        <li><div class="n"><span>Drop ${String(d.n).padStart(3, '0')}</span><span>${esc(new Date(d.date + 'T12:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' }))}</span><span class="chainpill">${d.chain?.status === 'minted' ? 'On Base' : 'Not minted yet'}</span></div>
+        <div class="ttl">${esc(d.title)}</div><p>${esc(d.body)}</p></li>`).join('') || '<li class="empty">The first drop is on its way.</li>';
+    } catch { $('dropList').innerHTML = '<li class="empty">Build drops will show here.</li>'; }
+  }
+
+  async function act(btn) {
+    const i = +btn.dataset.i, kind = btn.dataset.act;
+    if (kind === 'skip') { btn.closest('.reply').remove(); brief.replies[i] = null; return recount(); }
+    if (kind === 'skiphold') { btn.closest('.hold').remove(); brief.holds[i] = null; return recount(); }
+    btn.disabled = true; const label = btn.textContent; btn.textContent = 'Working…';
+    const item = kind === 'send' ? brief.replies[i] : brief.holds[i];
+    const payload = kind === 'send'
+      ? { kind: 'reply', to: item.to, subject: item.subject, body: $(`d${i}`).value, threadId: item.threadId, inReplyTo: item.inReplyTo, references: item.references }
+      : { kind: 'hold', title: item.title, start: item.start, end: item.end, zone: brief.zone || tz };
+    try {
+      let receipt;
+      if (demo) {
+        await new Promise(r => setTimeout(r, 500));
+        receipt = kind === 'send' ? { kind: 'reply', at: new Date().toISOString(), to: item.to, subject: item.subject, sample: true } : { kind: 'hold', at: new Date().toISOString(), title: item.title, start: item.start, end: item.end, sample: true };
+      } else {
+        const r = await fetch('/api/work/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'failed');
+        receipt = j.receipt;
+      }
+      saveReceipt(receipt);
+      const wrap = btn.closest(kind === 'send' ? '.reply' : '.hold');
+      wrap.querySelector('.row').innerHTML = `<span class="done">${kind === 'send' ? 'Sent' : 'Held on your calendar'}${demo ? ' (sample, nothing left this page)' : ''}</span>`;
+      const ta = wrap.querySelector('textarea'); if (ta) ta.readOnly = true;
+      if (kind === 'send') brief.replies[i] = null; else brief.holds[i] = null;
+      recount();
+    } catch (e) {
+      btn.disabled = false; btn.textContent = label;
+      banner('blocked', `<b>That didn't go through.</b> ${e.message === 'signin' ? 'Your Google sign-in expired. Connect again.' : 'Nothing was sent or booked. Try again in a moment.'}`);
+    }
+  }
+
+  function recount() {
+    const n = brief.replies.filter(Boolean).length + brief.holds.filter(Boolean).length;
+    setSpark(n);
+  }
+
+  async function loadBrief() {
+    $('briefBody').innerHTML = '<div class="skeleton"></div><div class="skeleton" style="width:70%"></div><p class="empty">Genie is reading your day…</p>';
+    $('replyList').innerHTML = '<div class="skeleton"></div><div class="skeleton" style="width:60%"></div>';
+    const r = await fetch(`/api/work/brief?tz=${encodeURIComponent(tz)}`);
+    if (r.status === 401) { me.signedIn = false; return showSample(); }
+    if (!r.ok) {
+      banner('blocked', '<b>Genie couldn\'t build your brief.</b> Your Google connection is fine. Try Refresh in a minute.');
+      return showSample();
+    }
+    brief = await r.json(); demo = false;
+    renderBrief();
+  }
+
+  function showSample() {
+    brief = JSON.parse(JSON.stringify(SAMPLE)); demo = true;
+    $('modeChip').hidden = false;
+    renderBrief();
+  }
+
+  async function init() {
+    const params = new URLSearchParams(location.search);
+    const err = params.get('error');
+    try { me = await (await fetch('/api/work/me')).json(); } catch { me = { signedIn: false, ready: false }; }
+
+    if (me.signedIn) {
+      $('connect').hidden = true; $('who').hidden = false; $('modeChip').hidden = true;
+      $('whoName').textContent = me.email; if (me.picture) $('whoPic').src = me.picture; else $('whoPic').hidden = true;
+      if (me.founderNo) $('cubeNo').textContent = `F-${String(me.founderNo).padStart(4, '0')}`;
+      if (!me.access.gmail || !me.access.calendar) banner('held', `<b>Genie can only see part of your day.</b> You didn't allow ${!me.access.gmail ? 'Gmail' : 'Calendar'}. Connect again and tick both boxes.`, '<a class="btn ghost" href="/api/google/start">Connect again</a>');
+      await loadBrief();
+    } else {
+      showSample();
+      const msgs = {
+        beta: '<b>Genie Work is open to the first 100 founders.</b> That Google account isn\'t on the founder list yet. Use the email you paid with.',
+        denied: '<b>You didn\'t connect Google.</b> That\'s fine. This is a sample day so you can see what Genie does.',
+        state: '<b>Sign-in timed out.</b> Try connecting again.', exchange: '<b>Google sign-in failed.</b> Try again.',
+        norefresh: '<b>Google didn\'t give Genie lasting access.</b> Connect again and approve every box.',
+      };
+      if (err && msgs[err]) banner(err === 'denied' ? 'held' : 'blocked', msgs[err]);
+      else if (!me.ready) banner('held', '<b>This is a sample day.</b> Google connection opens when the Genie Work beta switches on. Everything below is example data, and nothing you tap leaves this page.');
+      else banner('active', '<b>This is a sample day.</b> Connect Google to see your own. Genie reads, drafts and waits for your Approve.');
+      if (!me.ready) { $('connect').removeAttribute('href'); $('connect').setAttribute('aria-disabled', 'true'); $('connect').style.opacity = .55; $('connect').style.pointerEvents = 'none'; }
+    }
+    if (err) history.replaceState(null, '', location.pathname);
+    renderReceipts();
+    renderDrops();
+  }
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]'); if (b) act(b);
+  });
+  $('refresh').addEventListener('click', () => me.signedIn ? loadBrief() : showSample());
+  $('signout').addEventListener('click', async () => {
+    await fetch('/api/google/signout', { method: 'POST' });
+    location.reload();
+  });
+  init();
+})();
+</script>
+</body>
+</html>
